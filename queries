@@ -1,0 +1,36 @@
+
+
+records = Auction.all.map{|x| {nick: x.auctioneer_data['nick'], nip: x.auctioneer_data['company_nip'], phones: x.auctioneer_data['phones'], emails: x.auctioneer_data['emails'], stan: x.auction_data['stan:'], faktura: x.auction_data['faktura:'].try(:strip), gwarancja: x.auction_data['gwarancja:']}}
+
+
+
+suspicious = records.select{|x| x[:faktura] == "Nie wystawiam faktury" && x[:stan] == "nowy" && !x[:nip].blank?}
+
+frauds = suspicious.uniq {|x| x[:nick]}
+
+suspicious_basic = records.select{|x| x[:faktura] == "Nie wystawiam faktury" && !x[:nip].blank?}
+
+frauds_basic = suspicious_basic.uniq {|x| x[:nick]}
+
+
+suspicious_marza = records.select{|x| x[:faktura] == "Wystawiam fakturę VAT-marża" && x[:stan] == "nowy" && !x[:nip].blank?}
+
+frauds_marza = suspicious_marza.uniq {|x| x[:nick]}
+
+
+# Przedmiot Nowy + Sprzedający Firma + Gwarancja serwisowa/brak
+suspicious_gwarancja = records.select{|x| ["WystawiamfakturVATmara", "Nie wystawiam faktury"].include?(x[:faktura]) && x[:stan] == "nowy" && !x[:nip].blank? && ['brak', 'serwisowa'].include?(x[:gwarancja])}
+
+frauds_gwarancja = suspicious_gwarancja.uniq {|x| x[:nick]}
+
+
+suspicious_nie_firma = records.select{|x| x[:stan] == "nowy" && x[:nip].blank?}
+# plus pandas
+
+
+nie_firma =
+
+
+multi_phone_nicks = ["HANDEL-KOSZALIN", "Outlet-Wyprzedaz", "artippl", "p-d-a", "e-kastel", "ekastel", "rtv-pl", "cool-shop", "Oficjalny sklep Huawei", "Oficjalny sklep Allegro", "Autoryzowany sklep Samsung", "X-KOM_PL", "itfslawek", "direct-sport-uk", "Oficjalny sklep Umi", "Oficjalny sklep Homtom"]
+
+
